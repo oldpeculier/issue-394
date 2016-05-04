@@ -3,17 +3,13 @@
 # Install nginx and rabbitmq
 repo=$1
 if [ "$repo" == "ondrej" ]; then
-  ! grep -qi "ondrej/php5" /etc/apt/sources.list.d/* && \
-    sudo add-apt-repository -y "ppa:ondrej/php5"
+  sudo add-apt-repository -y "ppa:ondrej/php5"
 else
-  grep -qi "ondrej/php5" /etc/apt/sources.list.d/* && \
-    sudo rm -f /etc/apt/source.list.d/ondrej-php5*
-  sudo apt-get remove php5 php5-cli -y
-  sudo apt-get update
-  sudo apt-get install rabbitmq-server php5 php5-cli -fy -t trusty-security
+  sudo rm -f /etc/apt/sources.list.d/ondrej-php5*
+  sudo apt-get autoremove php5 php5-cli -y
 fi
-php -v
-exit
+sudo apt-get update
+sudo apt-get install rabbitmq-server php5 php5-cli -y
 
 # Create some SSL certs
 export CAPASSPHRASE=secret # for signing
@@ -86,7 +82,7 @@ cat << EOF > ./test.php
 \$context = stream_context_create(array('ssl'=>array('cafile'=>\$cafile, 'verify_peer'=>true)));
 \$sock = stream_socket_client("ssl://".\$host.":".\$port,\$errno,\$errstr,10,STREAM_CLIENT_CONNECT,\$context);
 if (\$sock) {
-  echo "CONNECTED!\n";
+  echo "\n***********\nCONNECTED!\n***********\n\n";
 } else {
   echo "\$errno - \$errstr\n";
 }
